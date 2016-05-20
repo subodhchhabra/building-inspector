@@ -14,6 +14,7 @@
       <hr />
       <p>Welcome citizen cartographers!<br />Help unlock New York City's past by identifying<br />buildings and other details on beautiful old maps.</p>
       <%= link_to "GET STARTED", "javascript:;", :id => "link-learn-more", :class => "learn-more big-button" %>
+      <%= link_to "NEW MAPS!", @sticker_url, :id => "link-sticker", :class => "home-link" unless @sticker_url == nil %>
     </div>
   </div>
   <div id="intro">
@@ -108,16 +109,21 @@
     <div id="home-scores">
         <h3>Your inspections so far:</h3>
         <ul>
-          <li><%= link_to(image_tag("icon-geometry.svg", :class=>"task-icon"), geometry_path, :class=>"link-task") %> <strong><%= @score_geometry %></strong> <%= "footprint".pluralize(@score_geometry) %> checked
+          <li><%= link_to(image_tag("icon-geometry.svg", :class=>"task-icon"), geometry_path, :class=>"link-task") %> <strong><%= number_with_delimiter @score_geometry %></strong> <%= "footprint".pluralize(@score_geometry) %> checked
+            <% if (@rank_geometry != nil) %><br />You're #<%= number_with_delimiter(@rank_geometry) %><% end %>
             <br /><%= link_to("Inspect more!", geometry_path, :class=>"link-task") %></li>
-          <li><%= link_to(image_tag("icon-polygonfix.svg", :class=>"task-icon"), polygonfix_path, :class=>"link-task") %> <strong><%= @score_polygonfix %></strong> <%= "footprint".pluralize(@score_polygonfix) %> fixed
+          <li><%= link_to(image_tag("icon-polygonfix.svg", :class=>"task-icon"), polygonfix_path, :class=>"link-task") %> <strong><%= number_with_delimiter @score_polygonfix %></strong> <%= "footprint".pluralize(@score_polygonfix) %> fixed
+            <% if (@rank_polygonfix != nil) %><br />You're #<%= number_with_delimiter(@rank_polygonfix) %><% end %>
             <br /><%= link_to("Inspect more!", polygonfix_path, :class=>"link-task") %></li>
-          <li><%= link_to(image_tag("icon-address.svg", :class=>"task-icon"), address_path, :class=>"link-task") %> <strong><%= @score_address %></strong> <%= "building".pluralize(@score_address) %> addressed
+          <li><%= link_to(image_tag("icon-address.svg", :class=>"task-icon"), address_path, :class=>"link-task") %> <strong><%= number_with_delimiter @score_address %></strong> <%= "building".pluralize(@score_address) %> addressed
+            <% if (@rank_address != nil) %><br />You're #<%= number_with_delimiter(@rank_address) %><% end %>
             <br /><%= link_to("Inspect more!", address_path, :class=>"link-task") %></li>
-          <li><%= link_to(image_tag("icon-color.svg", :class=>"task-icon"), color_path, :class=>"link-task") %> <strong><%= @score_color %></strong> color <%= "ID".pluralize(@score_color) %>
+          <li><%= link_to(image_tag("icon-color.svg", :class=>"task-icon"), color_path, :class=>"link-task") %> <strong><%= number_with_delimiter @score_color %></strong> color <%= "ID".pluralize(@score_color) %>
+            <% if (@rank_color != nil) %><br />You're #<%= number_with_delimiter(@rank_color) %><% end %>
             <br /><%= link_to("Inspect more!", color_path, :class=>"link-task") %></li>
           <li>&nbsp;</li>
-          <li><%= link_to(image_tag("icon-toponym.svg", :class=>"task-icon"), toponym_path, :class=>"link-task") %> <strong><%= @score_toponym %></strong> place <%= "name".pluralize(@score_toponym) %>
+          <li><%= link_to(image_tag("icon-toponym.svg", :class=>"task-icon"), toponym_path, :class=>"link-task") %> <strong><%= number_with_delimiter @score_toponym %></strong> place <%= "name".pluralize(@score_toponym) %>
+            <% if (@rank_toponym != nil) %><br />You're #<%= number_with_delimiter(@rank_toponym) %><% end %>
             <br /><%= link_to("Inspect more!", toponym_path, :class=>"link-task") %></li>
         </ul>
     </div>
@@ -129,7 +135,7 @@
         <h4>Imagine if maps had a magic switch<br />that let you explore the geography of the past.</h4>
         <h4>The Library wants to do this for New York City, turning historical atlases into time machines.</h4>
       </div>
-      <p class="subhead">To do it we need to harvest all the fantastic detail from the original maps: building footprints, addresses, construction materials etc. — clues that will help unlock a million stories. With this information organized and searchable, you can ask new kinds of questions about history. Peel back the layers of the city and replay its growth. 'Check in' to vanished establishments and meet their ghostly proprietors. Or discover related historical documents (newspapers, photographs, business directories…) linked by place and time.</p>
+      <p class="subhead">To do it we need to harvest all the fantastic detail from the original maps: building footprints, addresses, place names, construction materials etc. — clues that will help unlock a million stories. With this information organized and searchable, you can ask new kinds of questions about history. Peel back the layers of the city and replay its growth. 'Check in' to vanished establishments and meet their ghostly proprietors. Or discover related historical documents (newspapers, photographs, business directories…) linked by place and time.</p>
         <%= link_to "GET STARTED", "javascript:;", :id => "link-explained-get-started", :class => "learn-more big-button" %>
       <p class="centered"><%= link_to "LEARN MORE", about_path %></p>
     </div>

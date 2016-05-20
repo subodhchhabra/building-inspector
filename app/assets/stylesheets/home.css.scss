@@ -90,6 +90,46 @@
   }
 }
 
+@include keyframes(popIn) {
+  0% {
+    @include transform(rotateZ(-200deg) scale(0));
+  }
+  90% {
+    @include transform(rotateZ(-20deg) scale(1.2));
+  }
+  100% {
+    @include transform(rotateZ(-20deg) scale(1));
+  }
+}
+
+#link-sticker {
+  position: absolute;
+  height: 100px;
+  width: 100px;
+  left: 50%;
+  bottom: 60px;
+  color: $white;
+  background: $orange;
+  text-align: center;
+  border-radius: 50px;
+  line-height: 100px;
+  margin-left: -170px;
+
+  @include transform(rotateZ(-20deg));
+
+  @include animation(popIn .35s ease-in);
+
+  @include transition(background-color, .2s);
+
+  &:hover {
+    background: $green;
+  }
+
+  @media screen and (max-width: $desktopwidth) {
+    font-size: 1.5em;
+  }
+}
+
 $welcomecolor: #23190D;
 
 #welcome {
@@ -104,6 +144,7 @@ $welcomecolor: #23190D;
   }
 
   .wrapper {
+    position: relative;
     width: 960px;
     min-height: 400px;
     margin: 0 auto;

@@ -1,8 +1,10 @@
 source 'https://rubygems.org'
 
-ruby '2.1.0'
+ruby '2.2.4'
 
-gem 'rails', '3.2.13'
+gem 'rails'#, '3.2.13'
+
+gem 'activerecord', '~> 3.2.22.1'
 
 gem 'newrelic_rpm'
 
@@ -16,7 +18,7 @@ gem 'byebug'
 
 # gem 'activerecord-postgis-adapter'
 
-gem 'compass-rails'
+gem 'compass-rails', '~> 3.0', '>= 3.0.1'
 
 gem 'animate'
 
@@ -25,6 +27,12 @@ gem 'unicorn'
 gem 'devise'
 
 gem 'will_paginate', '~> 3.0'
+
+group :development do
+	gem 'certified' # because openssl/omniauth issues in localhost
+end
+
+gem 'test-unit', '~> 3.0'
 
 gem 'omniauth-google-oauth2'
 gem 'omniauth-facebook'

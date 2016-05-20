@@ -14,7 +14,18 @@ class Polygon < ActiveRecord::Base
   # end
 
   def to_geojson
-     { :type => "Feature", :properties => { :id => id, :dn => dn, :sheet_id => sheet_id }, :geometry => { :type => "Polygon", :coordinates => JSON.parse(geometry) } }
+    # NOTE: this is a hack to allow for poly[:consensus] to be used in API
+    begin
+      c = JSON.parse(consensus)
+    rescue
+      begin
+        c = consensus
+      rescue
+        c = ""
+      end
+    end
+    # NOTE: end hack
+    { :type => "Feature", :properties => { :id => id, :dn => dn, :sheet_id => sheet_id, :consensus => c }, :geometry => { :type => "Polygon", :coordinates => JSON.parse(geometry) } }
   end
 
   def to_point_geojson
@@ -38,7 +49,7 @@ class Polygon < ActiveRecord::Base
   def consensus_address
     c = poly_consensus("address")
     if c == "N/A" || c == "NONE"
-      return c
+      return "NONE"
     end
     features = []
     c_array = JSON.parse(c)

@@ -58,17 +58,53 @@ class ApiController < ApplicationController
         # returns all the polygons with their consensus value
         count = 0
 
-        count = Polygon.select("COUNT(polygons.id) AS pcount").joins(:consensuspolygons).where("consensuspolygons.flaggable_id='Polygon' AND consensuspolygons.task=? AND consensuspolygons.consensus=?","geometry","yes").first.pcount
+        count = Polygon.select("COUNT(polygons.id) AS pcount").joins(:consensuspolygons).where("consensuspolygons.flaggable_type='Polygon' AND ((consensuspolygons.task=? AND consensuspolygons.consensus=?) OR consensuspolygons.task=?)","geometry","yes","polygonfix").first.pcount
 
         per_page = count if params[:brett]
 
-        poly = Polygon.select("*, (SELECT consensus FROM consensuspolygons _C WHERE _C.flaggable_id=polygons.id AND _C.flaggable_type='Polygon' AND _C.task='color') AS color").joins(:consensuspolygons).where("consensuspolygons.flaggable_id='Polygon' AND consensuspolygons.task=? AND consensuspolygons.consensus=?","geometry","yes").offset(offset).limit(per_page)
+        poly = Polygon.select("polygons.*, consensuspolygons.consensus, (SELECT consensus FROM consensuspolygons _C WHERE _C.flaggable_id=polygons.id AND _C.flaggable_type='Polygon' AND _C.task='color') AS color").joins(:consensuspolygons).where("consensuspolygons.flaggable_type='Polygon' AND ((consensuspolygons.task=? AND consensuspolygons.consensus=?) OR consensuspolygons.task=?)","geometry","yes","polygonfix").offset(offset).limit(per_page)
 
         msg = "List for informative purposes only. This is not a definitive list. This URL may be changed at any time without prior notice."
 
         geojson = []
         poly.each do |p|
-            geojson.push(p.to_geojson)
+            # byebug
+            if p[:consensus] == "yes"
+                as_geo = p.to_geojson
+                as_geo[:properties][:fixed] = false
+            else
+                temp = JSON.parse(p[:consensus])
+                as_geo = p.to_geojson
+                as_geo[:properties][:fixed] = true
+                as_geo[:geometry][:coordinates] = temp["features"][0]["geometry"]["coordinates"]
+            end
+            # adding map_id
+            as_geo[:properties][:map_id] = p.sheet[:map_id]
+            # adding moar consensus types
+            as_geo[:properties][:consensus_color] = p.color
+            consensus_address = p.consensus_address
+            as_geo[:properties][:consensus_address] = consensus_address
+
+            # put the poly geometry and address points in a new geometry
+            new_geo = {}
+            new_geo[:type] = "GeometryCollection"
+            new_geo[:geometries] = []
+
+            if consensus_address != nil && consensus_address != "N/A" && consensus_address != "NONE"
+                # address points and poly geometry live together
+                addresses = JSON.parse(consensus_address)
+
+                # put address properties in an array in the poly properties
+                as_geo[:properties][:consensus_address] = addresses["features"].each_with_index.map {|f,i| f["properties"]}
+
+                new_geo[:geometries] = addresses["features"].map { |f|  f["geometry"]}
+            end
+            new_geo[:geometries].unshift(as_geo[:geometry])
+
+            # replace the poly geometry with the new one
+            as_geo[:geometry] = new_geo
+
+            geojson.push(as_geo)
         end
 
         output = {}

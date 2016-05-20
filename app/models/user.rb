@@ -7,6 +7,7 @@ class User < ActiveRecord::Base
          :omniauthable, :omniauth_providers => [:google_oauth2, :facebook, :twitter]
 
   has_many :usersessions
+  has_many :user_scores
 
   # Setup accessible (or protected) attributes for your model
   attr_accessible :name, :email, :password, :password_confirmation, :remember_me, :provider, :uid, :role
@@ -32,7 +33,7 @@ class User < ActiveRecord::Base
         name: auth.extra.raw_info.name,
         provider: auth.provider,
         uid: auth.uid,
-        email: "#{auth.info.nickname}@facebook.com", # make sure this is unique
+        email: "#{auth.uid}@facebook.com", # make sure this is unique
         password: Devise.friendly_token[0,20]
       )
     end

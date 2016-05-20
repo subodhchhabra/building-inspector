@@ -8,7 +8,7 @@ class @Inspector
 
     window.nypl_inspector = @ # to make it accessible from console
     @desktopWidth = 600
-    @retries = 3
+    @retries = 5
 
     defaults =
       flaggableType: 'Polygon'
@@ -112,7 +112,7 @@ class @Inspector
             , 1000
         )
     )
-    @map.on('move', @onMapChange)
+    @map.on('moveend dragend resize', @onMapChange)
     @addButtonListeners()
     # rest should be implemented in the inspector instance
 
@@ -153,16 +153,18 @@ class @Inspector
       @miniMap.addLayer @minifog
 
   onMapChange: (e) =>
+    # console.log "map change"
     # move flags
     for flag, contents of @flags
-      latlng = contents.circle.getLatLng()
-      xy = @map.latLngToContainerPoint(latlng)
-      contents.elem.css("left",xy.x)
-      contents.elem.css("top",xy.y)
+        continue if !contents.circle?
+        latlng = contents.circle.getLatLng()
+        xy = @map.latLngToContainerPoint(latlng)
+        contents.elem.css("left",xy.x)
+        contents.elem.css("top",xy.y)
     # check if current polygon is somewhat visible in view
     # so user does not get lost
     return if !@options.constrainMapToPolygon
-    if @geo?.getBounds? and not @map.getBounds().intersects(@geo.getBounds())
+    if @geo?.getBounds? and not @map.getBounds().contains(@geo.getBounds())
       @map.fitBounds( @geo.getBounds() )
 
   onTutorialClick: (e) =>
@@ -374,7 +376,12 @@ class @Inspector
         # things are slightly different for editable polygon drawing
         @makeEditablePolygon()
       # center on the polygon
-      bounds = @geo.getBounds().pad(.1)
+      bounds = @geo.getBounds()
+      # console.log "bounds:", @map.getBounds().getSouthWest()
+      # console.log "bounds:", @map.getBounds().getNorthEast()
+      # console.log "new:", bounds.getSouthWest()
+      # console.log "new:", bounds.getNorthEast()
+      # console.log "contains:", @map.getBounds().contains(bounds)
       @map.fitBounds( bounds )
       # @map.setZoom( @map.getZoom()-1 ) if @options.tutorialOn
       @resetButtons()
@@ -395,7 +402,7 @@ class @Inspector
 
   endGame:() ->
     # no map found, die
-    msg = "<strong>No unprocessed data found for this task</strong><br />Good news! This seems to be complete. Maybe <a href='/random?not=#{@options.task}'>try another task</a>?"
+    msg = "<strong>No unprocessed data found for this task</strong><br />Good news! This seems to be complete. Maybe <a href='javascript:void(0)' onclick='window.location.href=\"/random?not=#{@options.task}\";'>try another task</a>?"
     @showMessage(msg, false)
     $(@options.buttonsID).hide()
 

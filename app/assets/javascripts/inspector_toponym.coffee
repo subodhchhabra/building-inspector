@@ -225,6 +225,7 @@ class Toponym extends Inspector
     m = @map
 
     flag.on 'add', ()->
+      # move point a few pixels down
       m.panTo(latlng, m.getZoom())
 
     flag.addTo @map
